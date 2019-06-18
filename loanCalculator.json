@@ -1,0 +1,692 @@
+{
+	"info": {
+		"_postman_id": "d8da1f67-d705-4ca3-98ad-5a2caa8b9e00",
+		"name": "Loan Origination",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Request authorize to login with Easy app",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "apikey",
+						"type": "text",
+						"value": "<Your API Key>"
+					},
+					{
+						"key": "apisecret",
+						"type": "text",
+						"value": "<Your API Secret>"
+					},
+					{
+						"key": "requestUId",
+						"type": "text",
+						"value": "{{$guid}}"
+					},
+					{
+						"key": "resourceOwnerId",
+						"type": "text",
+						"value": "<Your API Key>"
+					},
+					{
+						"key": "response-channel",
+						"type": "text",
+						"value": "mobile"
+					},
+					{
+						"key": "endState",
+						"value": "mobile_app",
+						"type": "text"
+					},
+					{
+						"key": "accept-language",
+						"value": "EN",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://api.partners.scb/partners/sandbox/v2/oauth/authorize",
+					"protocol": "https",
+					"host": [
+						"api",
+						"partners",
+						"scb"
+					],
+					"path": [
+						"partners",
+						"sandbox",
+						"v2",
+						"oauth",
+						"authorize"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Generate accessToken",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "resourceOwnerId",
+						"value": "<Your API Key>",
+						"type": "text"
+					},
+					{
+						"key": "requestUId",
+						"value": "{{$guid}}",
+						"type": "text"
+					},
+					{
+						"key": "accept-language",
+						"value": "EN",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"applicationKey\" : \"<Your API Key>\",\r\n\t\"applicationSecret\" : \"<Your API Secret>\",\r\n\t\"authCode\" : \"<Authorization Code>\"\r\n}"
+				},
+				"url": {
+					"raw": "https://api.partners.scb/partners/sandbox/v1/oauth/token",
+					"protocol": "https",
+					"host": [
+						"api",
+						"partners",
+						"scb"
+					],
+					"path": [
+						"partners",
+						"sandbox",
+						"v1",
+						"oauth",
+						"token"
+					]
+				},
+				"description": "POST /partners/v1/oauth/token"
+			},
+			"response": []
+		},
+		{
+			"name": "01 Simulate loan  POST /v1/loanorigination/simulator/calculate",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d6da3d2a-ebbe-4e9a-83e8-1b079b0473fa",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "content-type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "authorization",
+						"type": "text",
+						"value": "bearer <Your Access Token>"
+					},
+					{
+						"key": "resourceOwnerId",
+						"type": "text",
+						"value": "<The value of resourceOwnerId from the response header of /v1/oauth/token>"
+					},
+					{
+						"key": "requestUId",
+						"type": "text",
+						"value": "{{$guid}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"loan\": {\r\n        \"productIntent\": \"GENERAL\",\r\n        \"totalRequestAmount\": 100000.00,\r\n        \"paymentFrequency\": \"Monthly\",\r\n        \"loanTenor\": 24,\r\n        \"installmentAmount\": 5000.00,\r\n        \"gracePeriod\": 0,\r\n        \"dueDay\": 25\r\n\r\n    }\r\n}"
+				},
+				"url": {
+					"raw": "https://api.partners.scb/partners/sandbox/v1/loanorigination/simulator/calculate",
+					"protocol": "https",
+					"host": [
+						"api",
+						"partners",
+						"scb"
+					],
+					"path": [
+						"partners",
+						"sandbox",
+						"v1",
+						"loanorigination",
+						"simulator",
+						"calculate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "02 Create loan application POST /v1/loanorigination/applications",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d0eb59a7-6033-40ab-8070-9907d70e2c98",
+						"exec": [
+							"//Get application ID",
+							"var jsonData = pm.response.json();",
+							"var appId = jsonData.data.applicationId;",
+							"pm.globals.set(\"appId\", appId);",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "content-type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "authorization",
+						"value": "bearer <Your Access Token>",
+						"type": "text"
+					},
+					{
+						"key": "resourceOwnerId",
+						"type": "text",
+						"value": "<The value of resourceOwnerId from the response header of /v1/oauth/token>"
+					},
+					{
+						"key": "requestUId",
+						"type": "text",
+						"value": "{{$guid}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"loan\": {\r\n        \"productIntent\": \"GENERAL\"\r\n    }\r\n}"
+				},
+				"url": {
+					"raw": "https://api.partners.scb/partners/sandbox/v1/loanorigination/applications",
+					"protocol": "https",
+					"host": [
+						"api",
+						"partners",
+						"scb"
+					],
+					"path": [
+						"partners",
+						"sandbox",
+						"v1",
+						"loanorigination",
+						"applications"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "03 Retrive application GET /v1/loanorigination/applications/{appId}",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "3ec42b41-81e7-4218-a0af-06fd2dcf51d7",
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.globals.set(\"Your-mobile\", jsonData.data.customer.contactInfo.mobileNo);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "content-type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "bearer <Your Access Token>"
+					},
+					{
+						"key": "resourceOwnerId",
+						"type": "text",
+						"value": "<The value of resourceOwnerId from the response header of /v1/oauth/token>"
+					},
+					{
+						"key": "requestUId",
+						"type": "text",
+						"value": "{{$guid}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://api.partners.scb/partners/sandbox/v1/loanorigination/applications/{{appId}}",
+					"protocol": "https",
+					"host": [
+						"api",
+						"partners",
+						"scb"
+					],
+					"path": [
+						"partners",
+						"sandbox",
+						"v1",
+						"loanorigination",
+						"applications",
+						"{{appId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "04 Edit loan application PUT /v1/loanorigination/applications/{appId}",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b0d6a11b-0fd2-4160-b22b-3928d76dc808",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "content-type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "bearer <Your Access Token>",
+						"type": "text"
+					},
+					{
+						"key": "resourceOwnerId",
+						"type": "text",
+						"value": "<The value of resourceOwnerId from the response header of /v1/oauth/token>"
+					},
+					{
+						"key": "requestUId",
+						"type": "text",
+						"value": "{{$guid}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"ncbConsentFlag\": true,\r\n  \"crossSellConsentFlag\": true,\r\n  \"modelConsentFlag\": true,\r\n  \"tncFlag\": true,\r\n  \"customer\": {\r\n    \"dateOfBirth\": \"1995-04-13\",\r\n    \"title\": \"นาย\",\r\n    \"firstNameThai\": \"ทดสอบ\",\r\n    \"middleNameThai\": \"ดิ\",\r\n    \"lastNameThai\": \"หน่อย\",\r\n    \"firstNameEnglish\": \"Todsob\",\r\n    \"middleNameEnglish\": \"Di\",\r\n    \"lastNameEnglish\": \"Nhoi\",\r\n    \"idCardExpiryDate\": \"2020-10-10\",\r\n    \"idCardLaserCode\": \"1234567890\",\r\n    \"businessInfo\": {\r\n      \"monthsOfBusinessExp\": 2,\r\n      \"yearsOfBusinessExp\": 2\r\n    },\r\n    \"personalInfo\": {\r\n      \"educationLevel\": \"16\",\r\n      \"gender\": \"M\",\r\n      \"hasChildren\": \"99\",\r\n      \"maritalStatus\": \"U\"\r\n    },\r\n    \"contactInfo\": {\r\n      \"currentAddress\": {\r\n        \"formatCode\": \"3\",\r\n        \"addressNo\": \"11/11\",\r\n        \"building\": \"22\",\r\n        \"floor\": \"33\",\r\n        \"room\": \"44\",\r\n        \"moo\": \"55\",\r\n        \"soi\": \"66\",\r\n        \"mooBan\": \"77\",\r\n        \"road\": \"88\",\r\n        \"amphur\": \"กลอนโต\",\r\n        \"province\": \"กาญจนบุรี\",\r\n        \"district\": \"ด่านมะขามเตี้ย\",\r\n        \"zipCode\": \"71260\",\r\n        \"typeOfHouseHold\": \"1\",\r\n        \"typeOfResidence\": \"H\"\r\n      },\r\n      \"email\": \"hello@kitty.com\",\r\n      \"mobileNo\": \"{{Your-mobile}}\"\r\n    },\r\n    \"employmentInfo\": {\r\n      \"employerName\": \"STK00002\",\r\n      \"mainIncome\": 75000.00,\r\n      \"position\": \"074\",\r\n      \"professional\": \"62\",\r\n      \"sourceOfIncome\": \"TH\",\r\n      \"officeAddress\": {\r\n        \"formatCode\": \"1\",\r\n        \"addressNo\": \"90\",\r\n        \"building\": \"11\",\r\n        \"floor\": \"22\",\r\n        \"room\": \"33\",\r\n        \"moo\": \"44\",\r\n        \"soi\": \"55\",\r\n        \"mooBan\": \"66\",\r\n        \"road\": \"77\",\r\n        \"amphur\": \"ถาวรวัฒนา\",\r\n        \"province\": \"กำแพงเพชร\",\r\n        \"district\": \"ทรายทองวัฒนา\",\r\n        \"zipCode\": \"62190\"\r\n      },\r\n      \"telephoneNo\": \"021234567\"\r\n    }\r\n  },\r\n  \"loan\": {\r\n    \"totalRequestAmount\": 100000.00,\r\n    \"paymentFrequency\": \"Monthly\",\r\n    \"dueDay\": 25,\r\n    \"installmentAmount\": 8333.33,\r\n    \"gracePeriod\": 0\r\n  }\r\n}"
+				},
+				"url": {
+					"raw": "https://api.partners.scb/partners/sandbox/v1/loanorigination/applications/{{appId}}",
+					"protocol": "https",
+					"host": [
+						"api",
+						"partners",
+						"scb"
+					],
+					"path": [
+						"partners",
+						"sandbox",
+						"v1",
+						"loanorigination",
+						"applications",
+						"{{appId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "05 Upload document POST /v1/loanorigination/applications/{appId}/documents",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "111e1f9a-d7ba-415a-a4c0-6a7ab9e9e280",
+						"exec": [
+							"var jsonData = pm.response.json();",
+							"pm.globals.set(\"docId\", jsonData.data.upload.documentId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "content-type",
+						"value": "multipart/form-data"
+					},
+					{
+						"key": "Authorization",
+						"value": "bearer <Your Access Token>",
+						"type": "text"
+					},
+					{
+						"key": "resourceOwnerId",
+						"type": "text",
+						"value": "<The value of resourceOwnerId from the response header of /v1/oauth/token>"
+					},
+					{
+						"key": "requestUId",
+						"type": "text",
+						"value": "{{$guid}}"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "documentType",
+							"value": "SALARY",
+							"type": "text"
+						},
+						{
+							"key": "documentFile",
+							"type": "file",
+							"src": ""
+						},
+						{
+							"key": "documentPassword",
+							"value": "password",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://api.partners.scb/partners/sandbox/v1/loanorigination/applications/{{appId}}/documents",
+					"protocol": "https",
+					"host": [
+						"api",
+						"partners",
+						"scb"
+					],
+					"path": [
+						"partners",
+						"sandbox",
+						"v1",
+						"loanorigination",
+						"applications",
+						"{{appId}}",
+						"documents"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "06  Review document GET /v1/loanorigination/applications/{appID}/documents",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "content-type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "bearer <Your Access Token>"
+					},
+					{
+						"key": "resourceOwnerId",
+						"type": "text",
+						"value": "<The value of resourceOwnerId from the response header of /v1/oauth/token>"
+					},
+					{
+						"key": "requestUId",
+						"type": "text",
+						"value": "{{$guid}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://api.partners.scb/partners/sandbox/v1/loanorigination/applications/{{appId}}/documents",
+					"protocol": "https",
+					"host": [
+						"api",
+						"partners",
+						"scb"
+					],
+					"path": [
+						"partners",
+						"sandbox",
+						"v1",
+						"loanorigination",
+						"applications",
+						"{{appId}}",
+						"documents"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "07 Delete document POST /v1/loanorigination/applications/{appId}/documents/{docId}",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "content-type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "bearer <Your Access Token>",
+						"type": "text"
+					},
+					{
+						"key": "resourceOwnerID",
+						"type": "text",
+						"value": "<The value of resourceOwnerId from the response header of /v1/oauth/token>"
+					},
+					{
+						"key": "requestUId",
+						"type": "text",
+						"value": "{{$guid}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://api.partners.scb/partners/sandbox/v1/loanorigination/applications/{{appId}}/documents/{{docId}}",
+					"protocol": "https",
+					"host": [
+						"api",
+						"partners",
+						"scb"
+					],
+					"path": [
+						"partners",
+						"sandbox",
+						"v1",
+						"loanorigination",
+						"applications",
+						"{{appId}}",
+						"documents",
+						"{{docId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "08 Submit loan application POST /v1/loanorigination/applications/submit",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "content-type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "authorization",
+						"type": "text",
+						"value": "bearer <Your Access Token>"
+					},
+					{
+						"key": "resourceOwnerId",
+						"type": "text",
+						"value": "<The value of resourceOwnerId from the response header of /v1/oauth/token>"
+					},
+					{
+						"key": "requestUId",
+						"type": "text",
+						"value": "{{$guid}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"applicationId\": \"{{appId}}\"\r\n}"
+				},
+				"url": {
+					"raw": "https://api.partners.scb/partners/sandbox/v1/loanorigination/applications/submit",
+					"protocol": "https",
+					"host": [
+						"api",
+						"partners",
+						"scb"
+					],
+					"path": [
+						"partners",
+						"sandbox",
+						"v1",
+						"loanorigination",
+						"applications",
+						"submit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "09 Cancel loan application POST /v1/loanorigination/applications/cancel",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "content-type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "authorization",
+						"value": "bearer <Your Access Token>",
+						"type": "text"
+					},
+					{
+						"key": "resourceOwnerId",
+						"type": "text",
+						"value": "<The value of resourceOwnerId from the response header of /v1/oauth/token>"
+					},
+					{
+						"key": "requestUId",
+						"type": "text",
+						"value": "{{$guid}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"applicationId\": \"{{appId}}\"\r\n}"
+				},
+				"url": {
+					"raw": "https://api.partners.scb/partners/sandbox/v1/loanorigination/applications/cancel",
+					"protocol": "https",
+					"host": [
+						"api",
+						"partners",
+						"scb"
+					],
+					"path": [
+						"partners",
+						"sandbox",
+						"v1",
+						"loanorigination",
+						"applications",
+						"cancel"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

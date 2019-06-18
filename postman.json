@@ -1,0 +1,165 @@
+{
+	"info": {
+		"_postman_id": "49f101ac-df8a-4106-a669-e216b5664fba",
+		"name": "Sharing Customer Profiles",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. /partners/sandbox/v2/oauth/authorize",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "apikey",
+						"value": "<Your API Key>"
+					},
+					{
+						"key": "apisecret",
+						"value": "<Your API Secret>"
+					},
+					{
+						"key": "resourceOwnerId",
+						"value": "<Your API Key>"
+					},
+					{
+						"key": "requestUId",
+						"value": "{{$guid}}"
+					},
+					{
+						"key": "response-channel",
+						"value": "mobile"
+					},
+					{
+						"key": "endState",
+						"value": "mobile_app"
+					},
+					{
+						"key": "accept-language",
+						"value": "EN"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://api.partners.scb/partners/sandbox/v2/oauth/authorize",
+					"protocol": "https",
+					"host": [
+						"api",
+						"partners",
+						"scb"
+					],
+					"path": [
+						"partners",
+						"sandbox",
+						"v2",
+						"oauth",
+						"authorize"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2. /partners/sandbox/v1/oauth/token",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "resourceOwnerId",
+						"value": "<Your API Key>",
+						"type": "text"
+					},
+					{
+						"key": "requestUId",
+						"value": "{{$guid}}",
+						"type": "text"
+					},
+					{
+						"key": "accept-language",
+						"value": "EN",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"applicationKey\" : \"<Your API Key>\",\r\n\t\"applicationSecret\" : \"<Your API Secret>\",\r\n\t\"authCode\" : \"<Authorization Code>\"\r\n}"
+				},
+				"url": {
+					"raw": "https://api.partners.scb/partners/sandbox/v1/oauth/token",
+					"protocol": "https",
+					"host": [
+						"api",
+						"partners",
+						"scb"
+					],
+					"path": [
+						"partners",
+						"sandbox",
+						"v1",
+						"oauth",
+						"token"
+					]
+				},
+				"description": "POST /partners/v1/oauth/token"
+			},
+			"response": []
+		},
+		{
+			"name": "3. /partners/sandbox/v1/customers/profile",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "authorization",
+						"value": "Bearer <Your Access Token>",
+						"type": "text"
+					},
+					{
+						"key": "resourceOwnerId",
+						"value": "<The value of resourceOwnerId from the response header of /partners/v1/oauth/token>",
+						"type": "text"
+					},
+					{
+						"key": "requestUId",
+						"type": "text",
+						"value": "{{$guid}}"
+					},
+					{
+						"key": "accept-language",
+						"value": "EN",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://api.partners.scb/partners/sandbox/v1/customers/profile",
+					"protocol": "https",
+					"host": [
+						"api",
+						"partners",
+						"scb"
+					],
+					"path": [
+						"partners",
+						"sandbox",
+						"v1",
+						"customers",
+						"profile"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
